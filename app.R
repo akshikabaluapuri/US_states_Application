@@ -43,25 +43,12 @@ ui <- fluidPage(
                   checkboxInput("Plot2", "show/hide Boxplot", value =TRUE),
                   selectInput( "var1", "2.Select Boxplot",choices = c("Population"=1, "Income"=2
                   ),selected = 1,selectize = FALSE),
-                  
-                
-                  
-                 
-                  
-                  submitButton("Submit"),
-                  
-                  
-                  
-                  
+                   submitButton("Submit"),
                   radioButtons("Radio","3.Select Rate Chart(Panel 3) ",list("Illiteracy-Rate",
                                                                "Life-Expectancy-Rate",
                                                                "Murder-Rate",
                                                                "High-school-Rate"))  ,                                         
-                                                               
-                  
-                  
-                  
-                  submitButton("Submit") ),
+                                                               submitButton("Submit") ),
       
       # Show  plots 
      mainPanel(
