@@ -60,16 +60,16 @@ ui <- fluidPage(
                 
                h3("Summary of the variables"),
                verbatimTextOutput("sum"),
-                plotOutput("box")),
+                plotlyOutput("box")),
        
        tabPanel("Data",
                 h3("Data of the variables"),
-                plotOutput("scatter1"),DT::dataTableOutput("table") ),
+                plotlyOutput("scatter1"),DT::dataTableOutput("table") ),
       # tabPanel("ScatterPlot",plotlyOutput("scatter1")),
        
        tabPanel("Rates",
                 h3("Rates in US States"),
-                plotOutput("dradio"),
+                plotlyOutput("dradio"),
                 h3("Data of the variables"),
                 DT::dataTableOutput("pietable")))
        
@@ -132,7 +132,7 @@ server <- function(input, output) {
  
  # Boxplot
  
- output$box <-renderPlot({
+ output$box <-renderPlotly({
    colm1=as.numeric(input$var1)
    x1    <- st[,colm1] 
   
@@ -145,7 +145,7 @@ server <- function(input, output) {
     })
     
    
-    boxplot(x1,col = "green", main= "BoxPlot", xlab = paste("US States"))}
+    plot_ly(y=x1, type= "box", boxpoints ="all",jitter =0.3, pointpos =-1.8)}
  })
  
  
@@ -155,9 +155,17 @@ server <- function(input, output) {
  #scatter 
  stt <- data.frame(state.x77[,c(1,2,7,8)])
  
- output$scatter1 <- renderPlot({ 
+ output$scatter1 <- renderPlotly({ 
    
- scatterplotMatrix(stt , spread = FALSE, smoother.args = list(lty= 2),main = "Scatter plot")
+ plot_ly(st, x = st$Income, y = st$Population , type = 'scatter',color = st$Life.Exp,size = st$Income,
+            sizes = c(10, 50),
+            mode = "markers", marker = list( opacity = 0.5,sizemode = 'diameter'),
+            hoverinfo = 'text',
+            text = paste('State Name =', state.name)) %>%
+      colorbar(title = "Life expectancy in years")%>%
+      layout(title = "x = Income, y = Population ",
+             xaxis = list(title = "Per capita income",
+                          yaxis = list(title = "Population")))
     })
  
 
@@ -176,31 +184,37 @@ server <- function(input, output) {
      input$Radio
    })
    
-   output$dradio <- renderPlot({ 
+   output$dradio <- renderPlotly({ 
        
     if(r() == "Illiteracy-Rate"){ 
-        ggplot(datast, aes(x="Illiteracy-Rate", y = datast$Illiteracy, fill= state.name )) +
-         geom_bar(width = 1,colour = "grey50",size =1, stat = "identity")+
-         coord_polar("y", start = 0)}
-     else
-     
-     if(r() == "Life-Expectancy-Rate"){ 
-       ggplot(datast, aes(x="Life-Expectancy-Rate", y = datast$Life.Exp, fill= state.name)) +
-         geom_bar(width = 1,colour = "grey50",size =1, stat = "identity")+
-         coord_polar("y", start = 0)}
-     else
-     
-     if(r() == "Murder-Rate"){ 
-       ggplot(datast, aes(x="Murder-Rate", y = datast$Murder, fill= state.name)) +
-         geom_bar(width = 1,colour = "grey50",size =1, stat = "identity")+
-         coord_polar("y", start = 0)}
-     else
-     
-     
-     if(r() == "High-school-Rate"){ 
-      ggplot(datast, aes(x="High-school-Rate ", y = datast$HS.Grad, fill= state.name)) +
-         geom_bar(width = 1,colour = "grey50", size =1, stat = "identity")+
-         coord_polar("y", start = 0)}
+        
+    if(r() == "Illiteracy-Rate"){ 
+      plot_ly(datast, labels = st$state.name, values = datast$Illiteracy, type = 'pie') %>%
+        layout( 
+          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))}
+    else
+      
+      if(r() == "Life-Expectancy-Rate"){ 
+        plot_ly(datast, labels = st$state.name, values = datast$Life.Exp, type = 'pie') %>%
+          layout( 
+            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+            yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))}
+    else
+      
+      if(r() == "Murder-Rate"){ 
+        plot_ly(datast, labels = st$state.name, values = datast$Murder, type = 'pie') %>%
+          layout( 
+            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+            yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))}
+    else
+      
+      
+      if(r() == "High-school-Rate"){ 
+        plot_ly(datast, labels = st$state.name, values = datast$HS.Grad, type = 'pie') %>%
+          layout( 
+            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+            yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))}
      
 })
      
